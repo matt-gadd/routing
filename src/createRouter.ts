@@ -119,7 +119,7 @@ export interface RouterFactory extends ComposeFactory<Router, RouterOptions> {
 	 * Create a new instance of a Router.
 	 * @param options Options to use during creation.
 	 */
-	(options?: RouterOptions): Router;
+	(options: RouterOptions): Router;
 }
 
 const historyMap = new WeakMap<Router, HistoryManager>();
@@ -137,15 +137,15 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		}
 	},
 
-	start (context: Context): void {
+	start (context: Context): Task<boolean> {
 		const historyManager = historyMap.get(this);
 		const history = historyManager.history;
 		if (!historyManager.started) {
 			this.own(history.on('change', (event) => {
 				this.dispatch(context, event.value);
 			}));
-			this.dispatch(context, history.current);
 			historyManager.started = true;
+			return this.dispatch(context, history.current);
 		}
 	},
 

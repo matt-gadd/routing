@@ -4,19 +4,27 @@ import * as assert from 'intern/chai!assert';
 
 import createRoute from '../../src/createRoute';
 import createRouter from '../../src/createRouter';
+import createMemoryHistory from '../../src/history/createMemoryHistory';
 import { DefaultParameters, Context as C, Request, Parameters } from '../../src/interfaces';
 
 interface R extends Request<Parameters> {};
 
 suite('createRouter', () => {
 	test('dispatch resolves to false if no route was executed', () => {
-		return createRouter().dispatch({} as C, '/').then(d => {
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
+		return router.dispatch({} as C, '/').then(d => {
 			assert.isFalse(d);
 		});
 	});
 
 	test('dispatch resolves to true if a route was executed', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute());
 		return router.dispatch({} as C, '/').then(d => {
 			assert.isTrue(d);
@@ -25,7 +33,10 @@ suite('createRouter', () => {
 
 	test('dispatch rejects when errors occur', () => {
 		const err = {};
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ exec () { throw err; }}));
 		return router.dispatch({} as C, '/').then(() => {
 			assert.fail('Should not be called');
@@ -38,7 +49,10 @@ suite('createRouter', () => {
 		const execs: { context: C, params: Parameters }[] = [];
 
 		const context = {} as C;
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -67,7 +81,10 @@ suite('createRouter', () => {
 		const calls: { method: string, context: C, params: Parameters }[] = [];
 
 		const context = {} as C;
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -101,7 +118,10 @@ suite('createRouter', () => {
 		const calls: { method: string, context: C, params: Parameters }[] = [];
 
 		const context = {} as C;
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -124,7 +144,10 @@ suite('createRouter', () => {
 	test('dispatch selects routes in order of registration', () => {
 		const order: string[] = [];
 
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({
 			path: '/foo',
 			guard () {
@@ -145,7 +168,10 @@ suite('createRouter', () => {
 	});
 
 	test('dispatch emits navstart event', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 
 		let received = '';
 		router.on('navstart', event => {
@@ -157,7 +183,10 @@ suite('createRouter', () => {
 	});
 
 	test('navstart listeners can synchronously cancel routing', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			event.cancel();
@@ -169,7 +198,10 @@ suite('createRouter', () => {
 	});
 
 	test('navstart listeners can asynchronously cancel routing', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			const { cancel } = event.defer();
@@ -182,7 +214,10 @@ suite('createRouter', () => {
 	});
 
 	test('navstart listeners can asynchronously resume routing', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			const { resume } = event.defer();
@@ -195,7 +230,10 @@ suite('createRouter', () => {
 	});
 
 	test('all deferring navstart listeners must resume before routing continues', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 
 		const resumers: {(): void}[] = [];
@@ -229,7 +267,10 @@ suite('createRouter', () => {
 	});
 
 	test('dispatch can be canceled', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 
 		let executed = false;
 		router.append(createRoute({
@@ -255,10 +296,12 @@ suite('createRouter', () => {
 		let received: R;
 
 		const router = createRouter({
+			history: createMemoryHistory(),
 			fallback (request) {
 				received = request;
 			}
 		});
+		router.start({});
 
 		const context = {} as C;
 		return router.dispatch(context, '/foo').then(d => {
@@ -272,7 +315,10 @@ suite('createRouter', () => {
 	test('can append several routes at once', () => {
 		const order: string[] = [];
 
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append([
 			createRoute({
 				path: '/foo',
@@ -295,7 +341,10 @@ suite('createRouter', () => {
 	});
 
 	test('leading slashes are irrelevant', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		const root = createRoute({ path: '/foo' });
 		const deep = createRoute({ path: 'bar' });
 		const deeper = createRoute({ path: 'baz' });
@@ -310,7 +359,10 @@ suite('createRouter', () => {
 
 	test('if present in route, there must be a trailing slash when selecting', () => {
 		return Promise.all([true, false].map(withSlash => {
-			const router = createRouter();
+			const router = createRouter({
+				history: createMemoryHistory()
+			});
+			router.start({});
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({ path: '/baz/' });
@@ -326,7 +378,10 @@ suite('createRouter', () => {
 
 	test('if not present in route, there must not be a trailing slash when selecting', () => {
 		return Promise.all([true, false].map(withSlash => {
-			const router = createRouter();
+			const router = createRouter({
+				history: createMemoryHistory()
+			});
+			router.start({});
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({ path: '/baz' });
@@ -342,7 +397,10 @@ suite('createRouter', () => {
 
 	test('routes can be configured to ignore trailing slash discrepancies', () => {
 		return Promise.all([true, false].map(withSlash => {
-			const router = createRouter();
+			const router = createRouter({
+				history: createMemoryHistory()
+			});
+			router.start({});
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({
@@ -360,7 +418,10 @@ suite('createRouter', () => {
 	});
 
 	test('search components are ignored', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo?bar').then(d => {
@@ -369,7 +430,10 @@ suite('createRouter', () => {
 	});
 
 	test('hash components are ignored', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo#bar').then(d => {
@@ -378,7 +442,10 @@ suite('createRouter', () => {
 	});
 
 	test('query & hash components are ignored', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo?bar#baz').then(d => {
@@ -391,7 +458,10 @@ suite('createRouter', () => {
 	});
 
 	test('repeated slashes have no effect', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 		router.append(createRoute({ path: '/foo/bar' }));
 
 		return router.dispatch({} as C, '//foo///bar').then(d => {
@@ -400,7 +470,10 @@ suite('createRouter', () => {
 	});
 
 	test('query parameters are extracted', () => {
-		const router = createRouter();
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		router.start({});
 
 		let extracted: DefaultParameters = {};
 		router.append(createRoute({
