@@ -3,9 +3,11 @@ import createEvented, { Evented, EventedOptions, EventedListener, TargettedEvent
 import { Handle } from 'dojo-core/interfaces';
 import Promise from 'dojo-core/Promise';
 import Task from 'dojo-core/async/Task';
+import WeakMap from 'dojo-core/WeakMap';
 
 import { Route, Handler } from './createRoute';
 import { Context, Parameters, Request } from './interfaces';
+import { History } from './history/interfaces';
 import { parse as parsePath } from './_path';
 
 /**
@@ -60,6 +62,8 @@ export interface RouterMixin {
 	 */
 	append(routes: Route<Parameters> | Route<Parameters>[]): void;
 
+	start (context: Context): void;
+
 	/**
 	 * Select and execute routes for a given path.
 	 * @param context A context object that is provided when executing selected routes.
@@ -99,6 +103,8 @@ export interface RouterOptions extends EventedOptions {
 	 *   are available.
 	 */
 	fallback?(request: Request<any>): void;
+
+	history: History;
 }
 
 export interface RouterFactory extends ComposeFactory<Router, RouterOptions> {
@@ -109,7 +115,10 @@ export interface RouterFactory extends ComposeFactory<Router, RouterOptions> {
 	(options?: RouterOptions): Router;
 }
 
+const historyMap = new WeakMap<Router, History>();
+
 const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
+
 	append (routes: Route<Parameters> | Route<Parameters>[]) {
 		if (Array.isArray(routes)) {
 			for (const route of routes) {
@@ -119,6 +128,15 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		else {
 			this.routes.push(routes);
 		}
+	},
+
+	start (context: Context): void {
+		const router = (<Router> this);
+		const history = historyMap.get(router);
+		router.own(history.on('change', (event) => {
+			router.dispatch(context, event.value);
+		}));
+		router.dispatch(context, history.current);
 	},
 
 	dispatch (context: Context, path: string): Task<boolean> {
@@ -201,12 +219,18 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 	}
 }).mixin({
 	mixin: createEvented,
-	initialize(instance: Router, { fallback }: RouterOptions = {}) {
+	initialize(instance: Router, { history, fallback }: RouterOptions) {
 		instance.routes = [];
 
 		if (fallback) {
 			instance.fallback = fallback;
 		}
+
+		if (!history) {
+			throw Error('no history manager provided');
+		}
+		historyMap.set(instance, history);
+		instance.own(history);
 	}
 });
 
