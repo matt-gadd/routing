@@ -62,7 +62,7 @@ export interface RouterMixin {
 	 */
 	append(routes: Route<Parameters> | Route<Parameters>[]): void;
 
-	start (context: Context): void;
+	start (context: Context): Task<boolean>;
 
 	/**
 	 * Select and execute routes for a given path.

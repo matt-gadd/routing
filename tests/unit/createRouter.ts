@@ -497,4 +497,21 @@ suite('createRouter', () => {
 			assert.deepEqual(extracted, {});
 		});
 	});
+
+	test('dispatches immediately when calling start', () => {
+		const router = createRouter({
+			history: createMemoryHistory({ path: '/foo' })
+		});
+		let executed = false;
+		router.append(createRoute({
+			path: '/foo',
+			exec () {
+				executed = true;
+			}
+		}));
+		return router.start({}).then((dispatched) => {
+			assert.isTrue(executed);
+			assert.isTrue(dispatched);
+		});
+	});
 });
