@@ -227,7 +227,7 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		}
 
 		if (!history) {
-			throw Error('no history manager provided');
+			throw new Error('No history manager provided');
 		}
 		historyMap.set(instance, history);
 		instance.own(history);
