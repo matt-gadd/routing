@@ -526,6 +526,7 @@ suite('createRouter', () => {
 			}
 		}));
 		router.start({});
+		assert.isTrue(false); // fix up!
 	});
 
 	test('throws if no history manager provided', () => {
