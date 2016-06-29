@@ -145,8 +145,8 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 				this.dispatch(context, event.value);
 			}));
 			historyManager.started = true;
-			return this.dispatch(context, history.current);
 		}
+		return this.dispatch(context, history.current);
 	},
 
 	dispatch (context: Context, path: string): Task<boolean> {
