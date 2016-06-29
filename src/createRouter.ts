@@ -107,6 +107,13 @@ export interface RouterOptions extends EventedOptions {
 	history: History;
 }
 
+interface HistoryManager {
+
+	started: boolean;
+
+	history: History;
+}
+
 export interface RouterFactory extends ComposeFactory<Router, RouterOptions> {
 	/**
 	 * Create a new instance of a Router.
@@ -115,7 +122,7 @@ export interface RouterFactory extends ComposeFactory<Router, RouterOptions> {
 	(options?: RouterOptions): Router;
 }
 
-const historyMap = new WeakMap<Router, History>();
+const historyMap = new WeakMap<Router, HistoryManager>();
 
 const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 
@@ -131,15 +138,23 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 	},
 
 	start (context: Context): void {
-		const router = (<Router> this);
-		const history = historyMap.get(router);
-		router.own(history.on('change', (event) => {
-			router.dispatch(context, event.value);
-		}));
-		router.dispatch(context, history.current);
+		const historyManager = historyMap.get(this);
+		const history = historyManager.history;
+		if (!historyManager.started) {
+			this.own(history.on('change', (event) => {
+				this.dispatch(context, event.value);
+			}));
+			this.dispatch(context, history.current);
+			historyManager.started = true;
+		}
 	},
 
 	dispatch (context: Context, path: string): Task<boolean> {
+		const historyManager = historyMap.get(this);
+		if (!historyManager.started) {
+			throw new Error('Cannot dispatch without starting the router');
+		}
+
 		let canceled = false;
 		const cancel = () => {
 			canceled = true;
@@ -229,7 +244,7 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		if (!history) {
 			throw new Error('No history manager provided');
 		}
-		historyMap.set(instance, history);
+		historyMap.set(instance, { history, started: false });
 		instance.own(history);
 	}
 });
