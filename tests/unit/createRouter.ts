@@ -498,7 +498,7 @@ suite('createRouter', () => {
 		});
 	});
 
-	test('dispatches immediately when calling start', () => {
+	test('dispatches on start', () => {
 		const router = createRouter({
 			history: createMemoryHistory({ path: '/foo' })
 		});
@@ -514,4 +514,29 @@ suite('createRouter', () => {
 			assert.isTrue(dispatched);
 		});
 	});
+
+	test('dispatches on history change', () => {
+		const history = createMemoryHistory();
+		const router = createRouter({ history });
+		let executed = false;
+		router.append(createRoute({
+			path: '/foo',
+			exec () {
+				executed = true;
+			}
+		}));
+		router.start({});
+	});
+
+	test('throws if no history manager provided', () => {
+		assert.throws(() => createRouter({ history: undefined }));
+	});
+
+	test('throws if dispatch called before start', () => {
+		const router = createRouter({
+			history: createMemoryHistory()
+		});
+		assert.throws(() => router.dispatch({}, '/foo'));
+	});
+
 });
