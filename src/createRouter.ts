@@ -8,7 +8,7 @@ import WeakMap from 'dojo-core/WeakMap';
 
 import { Route, Handler } from './createRoute';
 import { Context, Parameters, Request } from './interfaces';
-import { History } from './history/interfaces';
+import { History, HistoryChangeEvent } from './history/interfaces';
 import { parse as parsePath } from './_path';
 
 /**
@@ -239,7 +239,7 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 			instance.fallback = fallback;
 		}
 
-		const listener = pausable(history, 'change', (event) => {
+		const listener = pausable(history, 'change', (event: HistoryChangeEvent) => {
 			instance.dispatch({}, event.value);
 		});
 
