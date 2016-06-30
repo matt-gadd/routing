@@ -40,9 +40,17 @@ export interface HashHistoryFactory extends ComposeFactory<HashHistory, HashHist
 const createHashHistory: HashHistoryFactory = compose({
 
 	start() {
+		const { location, window } = global;
+		this._current = location.hash.slice(1);
+		this._location = location;
+
+		this.own(on(window, 'hashchange', () => {
+			this._onHashchange(location.hash.slice(1));
+		}));
+
 		this.emit({
 			type: 'change',
-			value: this.current
+			value: this._current
 		});
 	},
 
@@ -79,16 +87,7 @@ const createHashHistory: HashHistoryFactory = compose({
 		});
 	}
 }).mixin({
-	mixin: createEvented,
-	initialize(instance: HashHistory, { window }: HashHistoryOptions = { window: global }) {
-		const { location } = window;
-		instance._current = location.hash.slice(1);
-		instance._location = location;
-
-		instance.own(on(window, 'hashchange', () => {
-			instance._onHashchange(location.hash.slice(1));
-		}));
-	}
+	mixin: createEvented
 });
 
 export default createHashHistory;

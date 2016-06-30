@@ -39,9 +39,17 @@ export interface StateHistoryFactory extends ComposeFactory<StateHistory, StateH
 const createStateHistory: StateHistoryFactory = compose({
 
 	start() {
+		const { history, location, window } = global;
+		this._current = location.pathname + location.search;
+		this._history = history;
+
+		this.own(on(window, 'popstate', () => {
+			this._onPopstate(location.pathname + location.search);
+		}));
+
 		this.emit({
 			type: 'change',
-			value: this.current
+			value: this._current
 		});
 	},
 
@@ -80,16 +88,7 @@ const createStateHistory: StateHistoryFactory = compose({
 		}
 	}
 }).mixin({
-	mixin: createEvented,
-	initialize(instance: StateHistory, { window }: StateHistoryOptions = { window: global }) {
-		const { history, location } = window;
-		instance._current = location.pathname + location.search;
-		instance._history = history;
-
-		instance.own(on(window, 'popstate', () => {
-			instance._onPopstate(location.pathname + location.search);
-		}));
-	}
+	mixin: createEvented
 });
 
 export default createStateHistory;
