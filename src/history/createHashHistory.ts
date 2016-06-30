@@ -1,13 +1,14 @@
 import compose, { ComposeFactory } from 'dojo-compose/compose';
 import createEvented from 'dojo-compose/mixins/createEvented';
 import global from 'dojo-core/global';
-import on from 'dojo-core/on';
+import { pausable, PausableHandle } from 'dojo-core/on';
 
 import { History, HistoryOptions } from './interfaces';
 
 export interface HashHistoryMixin {
 	_current?: string;
 	_location?: Location;
+	_listener?: PausableHandle;
 	_onHashchange(path: string): void;
 }
 
@@ -40,7 +41,7 @@ export interface HashHistoryFactory extends ComposeFactory<HashHistory, HashHist
 const createHashHistory: HashHistoryFactory = compose({
 
 	listen() {
-		const { location, window } = global;
+		const { location } = global;
 		const current = location.hash.slice(1);
 		this._location = location;
 
@@ -52,12 +53,12 @@ const createHashHistory: HashHistoryFactory = compose({
 			});
 		}
 
-		this.own(on(window, 'hashchange', () => {
-			this._onHashchange(location.hash.slice(1));
-		}));
+		this._listener.pause();
 	},
 
-	unlisten() {},
+	unlisten() {
+		this._listener.resume();
+	},
 
 	get current () {
 		return this._current;
@@ -88,7 +89,15 @@ const createHashHistory: HashHistoryFactory = compose({
 		});
 	}
 }).mixin({
-	mixin: createEvented
+	mixin: createEvented,
+	initialize(instance: HashHistory, { window }: HashHistoryOptions = { window: global }) {
+		const { location } = window;
+		instance._listener = pausable(window, 'hashchange', () => {
+			instance._onHashchange(location.hash.slice(1));
+		});
+		instance._listener.pause();
+		instance.own(instance._listener);
+	}
 });
 
 export default createHashHistory;

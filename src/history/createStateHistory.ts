@@ -1,13 +1,14 @@
 import compose, { ComposeFactory } from 'dojo-compose/compose';
 import createEvented from 'dojo-compose/mixins/createEvented';
 import global from 'dojo-core/global';
-import on from 'dojo-core/on';
+import { pausable, PausableHandle } from 'dojo-core/on';
 
 import { BrowserHistory, History, HistoryOptions } from './interfaces';
 
 export interface StateHistoryMixin {
 	_current?: string;
 	_history?: BrowserHistory;
+	_listener?: PausableHandle;
 	_onPopstate(path: string): void;
 }
 
@@ -39,7 +40,7 @@ export interface StateHistoryFactory extends ComposeFactory<StateHistory, StateH
 const createStateHistory: StateHistoryFactory = compose({
 
 	listen() {
-		const { history, location, window } = global;
+		const { history, location } = global;
 		const current = location.pathname + location.search;
 		this._history = history;
 
@@ -50,10 +51,6 @@ const createStateHistory: StateHistoryFactory = compose({
 				value: this._current
 			});
 		}
-
-		this.own(on(window, 'popstate', () => {
-			this._onPopstate(location.pathname + location.search);
-		}));
 	},
 
 	unlisten() {},
@@ -93,7 +90,15 @@ const createStateHistory: StateHistoryFactory = compose({
 		}
 	}
 }).mixin({
-	mixin: createEvented
+	mixin: createEvented,
+	initialize(instance: StateHistory, { window }: StateHistoryOptions = { window: global }) {
+		const { location } = window;
+		instance._listener = pausable(window, 'popstate', () => {
+			instance._onPopstate(location.pathname + location.search);
+		});
+		instance._listener.pause();
+		instance.own(instance._listener);
+	}
 });
 
 export default createStateHistory;
