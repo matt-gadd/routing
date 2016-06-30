@@ -526,7 +526,7 @@ suite('createRouter', () => {
 			history: createMemoryHistory()
 		});
 
-		assert.throws(() => router.dispatch({}, '/foo'));
+		assert.throws(() => router.dispatch({}, '/foo'), /Cannot dispatch without starting the router/);
 	});
 
 });
