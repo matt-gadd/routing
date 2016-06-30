@@ -62,7 +62,7 @@ export interface RouterMixin {
 	 */
 	append(routes: Route<Parameters> | Route<Parameters>[]): void;
 
-	start (context: Context): Task<boolean>;
+	start (context: Context): void;
 
 	/**
 	 * Select and execute routes for a given path.
@@ -137,16 +137,18 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		}
 	},
 
-	start (context: Context): Task<boolean> {
+	start (context: Context): void {
 		const historyManager = historyMap.get(this);
 		const history = historyManager.history;
+
 		if (!historyManager.started) {
 			this.own(history.on('change', (event) => {
 				this.dispatch(context, event.value);
 			}));
+
 			historyManager.started = true;
+			history.start();
 		}
-		return this.dispatch(context, history.current);
 	},
 
 	dispatch (context: Context, path: string): Task<boolean> {

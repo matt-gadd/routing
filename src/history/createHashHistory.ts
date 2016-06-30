@@ -38,6 +38,14 @@ export interface HashHistoryFactory extends ComposeFactory<HashHistory, HashHist
 }
 
 const createHashHistory: HashHistoryFactory = compose({
+
+	start() {
+		this.emit({
+			type: 'change',
+			value: this.current
+		});
+	},
+
 	get current () {
 		return this._current;
 	},

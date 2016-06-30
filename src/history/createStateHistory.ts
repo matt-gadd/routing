@@ -37,6 +37,14 @@ export interface StateHistoryFactory extends ComposeFactory<StateHistory, StateH
 }
 
 const createStateHistory: StateHistoryFactory = compose({
+
+	start() {
+		this.emit({
+			type: 'change',
+			value: this.current
+		});
+	},
+
 	get current () {
 		return this._current;
 	},
