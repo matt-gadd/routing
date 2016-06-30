@@ -18,7 +18,9 @@ export interface HistoryChangeEvent extends TargettedEventObject {
  */
 export interface HistoryMixin {
 
-	start(): void;
+	listen(): void;
+
+	unlisten(): void;
 
 	/**
 	 * Get the current value. This is a path string.

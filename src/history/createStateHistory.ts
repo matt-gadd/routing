@@ -38,7 +38,7 @@ export interface StateHistoryFactory extends ComposeFactory<StateHistory, StateH
 
 const createStateHistory: StateHistoryFactory = compose({
 
-	start() {
+	listen() {
 		const { history, location, window } = global;
 		this._current = location.pathname + location.search;
 		this._history = history;
@@ -52,6 +52,8 @@ const createStateHistory: StateHistoryFactory = compose({
 			value: this._current
 		});
 	},
+
+	unlisten() {},
 
 	get current () {
 		return this._current;

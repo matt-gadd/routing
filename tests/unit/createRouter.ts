@@ -15,7 +15,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		return router.dispatch({} as C, '/').then(d => {
 			assert.isFalse(d);
 		});
@@ -25,7 +25,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute());
 		return router.dispatch({} as C, '/').then(d => {
 			assert.isTrue(d);
@@ -37,7 +37,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ exec () { throw err; }}));
 		return router.dispatch({} as C, '/').then(() => {
 			assert.fail('Should not be called');
@@ -53,7 +53,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -85,7 +85,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -122,7 +122,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		const root = createRoute({
 			path: '/{foo}',
 			exec ({ context, params }) {
@@ -148,7 +148,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({
 			path: '/foo',
 			guard () {
@@ -172,7 +172,6 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
 
 		let received = '';
 		router.on('navstart', event => {
@@ -187,7 +186,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			event.cancel();
@@ -202,7 +201,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			const { cancel } = event.defer();
@@ -218,7 +217,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 		router.on('navstart', event => {
 			const { resume } = event.defer();
@@ -234,7 +233,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 
 		const resumers: {(): void}[] = [];
@@ -271,7 +270,6 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
 
 		let executed = false;
 		router.append(createRoute({
@@ -302,7 +300,6 @@ suite('createRouter', () => {
 				received = request;
 			}
 		});
-		router.start({});
 
 		const context = {} as C;
 		return router.dispatch(context, '/foo').then(d => {
@@ -319,7 +316,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append([
 			createRoute({
 				path: '/foo',
@@ -345,7 +342,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		const root = createRoute({ path: '/foo' });
 		const deep = createRoute({ path: 'bar' });
 		const deeper = createRoute({ path: 'baz' });
@@ -363,7 +360,7 @@ suite('createRouter', () => {
 			const router = createRouter({
 				history: createMemoryHistory()
 			});
-			router.start({});
+
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({ path: '/baz/' });
@@ -382,7 +379,7 @@ suite('createRouter', () => {
 			const router = createRouter({
 				history: createMemoryHistory()
 			});
-			router.start({});
+
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({ path: '/baz' });
@@ -401,7 +398,7 @@ suite('createRouter', () => {
 			const router = createRouter({
 				history: createMemoryHistory()
 			});
-			router.start({});
+
 			const root = createRoute({ path: '/foo/' });
 			const deep = createRoute({ path: '/bar/' });
 			const deeper = createRoute({
@@ -422,7 +419,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo?bar').then(d => {
@@ -434,7 +431,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo#bar').then(d => {
@@ -446,7 +443,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo' }));
 
 		return router.dispatch({} as C, '/foo?bar#baz').then(d => {
@@ -462,7 +459,7 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
+
 		router.append(createRoute({ path: '/foo/bar' }));
 
 		return router.dispatch({} as C, '//foo///bar').then(d => {
@@ -474,7 +471,6 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
-		router.start({});
 
 		let extracted: DefaultParameters = {};
 		router.append(createRoute({
@@ -499,34 +495,25 @@ suite('createRouter', () => {
 		});
 	});
 
-	test('dispatches on start', () => {
+	test('dispatches on listen', () => {
 		const router = createRouter({
 			history: createMemoryHistory({ path: '/foo' })
 		});
-		const context = { 'foo': 'bar' };
 		const dispatch = sinon.stub(router, 'dispatch');
-		router.start(context);
 
-		assert.isTrue(dispatch.calledWith(context, '/foo'));
+		router.listen();
+
+		assert.isTrue(dispatch.calledWith({}, '/foo'));
 	});
 
 	test('dispatches on history change', () => {
 		const history = createMemoryHistory();
 		const router = createRouter({ history });
-		const context = { 'foo': 'bar' };
-		router.start(context);
 
 		const dispatch = sinon.stub(router, 'dispatch');
+
+		router.listen();
 		history.set('/foo');
-		assert.isTrue(dispatch.calledWith(context, '/foo'));
+		assert.isTrue(dispatch.calledWith({}, '/foo'));
 	});
-
-	test('throws if dispatch called before start', () => {
-		const router = createRouter({
-			history: createMemoryHistory()
-		});
-
-		assert.throws(() => router.dispatch({}, '/foo'), /Cannot dispatch without starting the router/);
-	});
-
 });

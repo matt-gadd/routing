@@ -33,11 +33,14 @@ export interface MemoryHistoryFactory extends ComposeFactory<MemoryHistory, Memo
 
 const createMemoryHistory: MemoryHistoryFactory = compose({
 
-	start () {
+	listen () {
 		this.emit({
 			type: 'change',
 			value: this.current
 		});
+	},
+
+	unlisten () {
 	},
 
 	get current () {

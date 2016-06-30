@@ -1,6 +1,7 @@
 import compose, { ComposeFactory } from 'dojo-compose/compose';
 import createEvented, { Evented, EventedOptions, EventedListener, TargettedEventObject } from 'dojo-compose/mixins/createEvented';
 import { Handle } from 'dojo-core/interfaces';
+import { pausable, PausableHandle } from 'dojo-core/on';
 import Promise from 'dojo-core/Promise';
 import Task from 'dojo-core/async/Task';
 import WeakMap from 'dojo-core/WeakMap';
@@ -62,7 +63,9 @@ export interface RouterMixin {
 	 */
 	append(routes: Route<Parameters> | Route<Parameters>[]): void;
 
-	start (context: Context): void;
+	listen (): void;
+
+	unlisten (): void;
 
 	/**
 	 * Select and execute routes for a given path.
@@ -109,7 +112,7 @@ export interface RouterOptions extends EventedOptions {
 
 interface HistoryManager {
 
-	started: boolean;
+	listener: PausableHandle;
 
 	history: History;
 }
@@ -137,26 +140,19 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		}
 	},
 
-	start (context: Context): void {
-		const historyManager = historyMap.get(this);
-		const history = historyManager.history;
+	listen (): void {
+		const { history, listener } = historyMap.get(this);
+		listener.resume();
+		history.listen();
+	},
 
-		if (!historyManager.started) {
-			this.own(history.on('change', (event) => {
-				this.dispatch(context, event.value);
-			}));
-
-			historyManager.started = true;
-			history.start();
-		}
+	unlisten (): void {
+		const { history, listener } = historyMap.get(this);
+		listener.pause();
+		history.unlisten();
 	},
 
 	dispatch (context: Context, path: string): Task<boolean> {
-		const historyManager = historyMap.get(this);
-		if (!historyManager.started) {
-			throw new Error('Cannot dispatch without starting the router');
-		}
-
 		let canceled = false;
 		const cancel = () => {
 			canceled = true;
@@ -243,7 +239,11 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 			instance.fallback = fallback;
 		}
 
-		historyMap.set(instance, { history, started: false });
+		const listener = pausable(history, 'change', (event) => {
+			instance.dispatch({}, event.value);
+		});
+
+		historyMap.set(instance, { history, listener });
 		instance.own(history);
 	}
 });
