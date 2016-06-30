@@ -5,6 +5,8 @@ import { History, HistoryOptions } from './interfaces';
 
 export interface MemoryHistoryMixin {
 	_current?: string;
+
+	_location?: string;
 }
 
 /**
@@ -34,10 +36,15 @@ export interface MemoryHistoryFactory extends ComposeFactory<MemoryHistory, Memo
 const createMemoryHistory: MemoryHistoryFactory = compose({
 
 	listen () {
-		this.emit({
-			type: 'change',
-			value: this.current
-		});
+		const current = this._location;
+
+		if (this._current !== current) {
+			this.emit({
+				type: 'change',
+				value: this._current
+			});
+			this._current = current;
+		}
 	},
 
 	unlisten () {},
@@ -48,6 +55,7 @@ const createMemoryHistory: MemoryHistoryFactory = compose({
 
 	set (path: string) {
 		this._current = path;
+		this._location = path;
 		this.emit({
 			type: 'change',
 			value: path
@@ -60,7 +68,7 @@ const createMemoryHistory: MemoryHistoryFactory = compose({
 }).mixin({
 	mixin: createEvented,
 	initialize(instance: MemoryHistory, { path }: MemoryHistoryOptions = { path: '' }) {
-		instance._current = path;
+		instance._location = path;
 	}
 });
 

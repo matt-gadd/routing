@@ -41,17 +41,20 @@ const createHashHistory: HashHistoryFactory = compose({
 
 	listen() {
 		const { location, window } = global;
-		this._current = location.hash.slice(1);
+		const current = location.hash.slice(1);
 		this._location = location;
+
+		if (this._current !== current) {
+			this.emit({
+				type: 'change',
+				value: this._current
+			});
+			this._current = current;
+		}
 
 		this.own(on(window, 'hashchange', () => {
 			this._onHashchange(location.hash.slice(1));
 		}));
-
-		this.emit({
-			type: 'change',
-			value: this._current
-		});
 	},
 
 	unlisten() {},
@@ -63,10 +66,6 @@ const createHashHistory: HashHistoryFactory = compose({
 	set (path: string) {
 		this._current = path;
 		this._location.hash = '#' + path;
-		this.emit({
-			type: 'change',
-			value: path
-		});
 	},
 
 	replace (path: string) {

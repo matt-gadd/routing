@@ -40,17 +40,20 @@ const createStateHistory: StateHistoryFactory = compose({
 
 	listen() {
 		const { history, location, window } = global;
-		this._current = location.pathname + location.search;
+		const current = location.pathname + location.search;
 		this._history = history;
+
+		if (this._current !== current) {
+			this.emit({
+				type: 'change',
+				value: this._current
+			});
+			this._current = current;
+		}
 
 		this.own(on(window, 'popstate', () => {
 			this._onPopstate(location.pathname + location.search);
 		}));
-
-		this.emit({
-			type: 'change',
-			value: this._current
-		});
 	},
 
 	unlisten() {},
