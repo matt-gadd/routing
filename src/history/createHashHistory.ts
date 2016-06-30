@@ -45,11 +45,11 @@ const createHashHistory: HashHistoryFactory = compose({
 		this._location = location;
 
 		if (this._current !== current) {
+			this._current = current;
 			this.emit({
 				type: 'change',
 				value: this._current
 			});
-			this._current = current;
 		}
 
 		this.own(on(window, 'hashchange', () => {

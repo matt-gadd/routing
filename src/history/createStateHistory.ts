@@ -44,11 +44,11 @@ const createStateHistory: StateHistoryFactory = compose({
 		this._history = history;
 
 		if (this._current !== current) {
+			this._current = current;
 			this.emit({
 				type: 'change',
 				value: this._current
 			});
-			this._current = current;
 		}
 
 		this.own(on(window, 'popstate', () => {

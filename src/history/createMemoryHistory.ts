@@ -39,11 +39,11 @@ const createMemoryHistory: MemoryHistoryFactory = compose({
 		const current = this._location;
 
 		if (this._current !== current) {
+			this._current = current;
 			this.emit({
 				type: 'change',
 				value: this._current
 			});
-			this._current = current;
 		}
 	},
 
