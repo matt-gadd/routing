@@ -246,6 +246,7 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 
 		historyMap.set(instance, { history, listener });
 		instance.own(history);
+		instance.own(listener);
 	}
 });
 
