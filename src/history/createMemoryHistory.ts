@@ -40,8 +40,7 @@ const createMemoryHistory: MemoryHistoryFactory = compose({
 		});
 	},
 
-	unlisten () {
-	},
+	unlisten () {},
 
 	get current () {
 		return this._current;
