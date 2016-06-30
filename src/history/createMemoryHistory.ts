@@ -5,7 +5,6 @@ import { History, HistoryOptions } from './interfaces';
 
 export interface MemoryHistoryMixin {
 	_current?: string;
-
 	_location?: string;
 }
 
