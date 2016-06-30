@@ -52,12 +52,11 @@ const createHashHistory: HashHistoryFactory = compose({
 				value: this._current
 			});
 		}
-
-		this._listener.pause();
+		this._listener.resume();
 	},
 
 	unlisten() {
-		this._listener.resume();
+		this._listener.pause();
 	},
 
 	get current () {

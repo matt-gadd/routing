@@ -51,9 +51,12 @@ const createStateHistory: StateHistoryFactory = compose({
 				value: this._current
 			});
 		}
+		this._listener.resume();
 	},
 
-	unlisten() {},
+	unlisten() {
+		this._listener.pause();
+	},
 
 	get current () {
 		return this._current;
