@@ -529,10 +529,6 @@ suite('createRouter', () => {
 		assert.isTrue(false); // fix up!
 	});
 
-	test('throws if no history manager provided', () => {
-		assert.throws(() => createRouter({ history: undefined }));
-	});
-
 	test('throws if dispatch called before start', () => {
 		const router = createRouter({
 			history: createMemoryHistory()

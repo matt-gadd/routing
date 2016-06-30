@@ -241,10 +241,6 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 			instance.fallback = fallback;
 		}
 
-		if (!history) {
-			throw new Error('No history manager provided');
-		}
-
 		historyMap.set(instance, { history, started: false });
 		instance.own(history);
 	}
