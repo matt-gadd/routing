@@ -502,14 +502,12 @@ suite('createRouter', () => {
 		const dispatch = sinon.stub(router, 'dispatch');
 
 		router.listen();
-
 		assert.isTrue(dispatch.calledWith({}, '/foo'));
 	});
 
 	test('dispatches on history change', () => {
 		const history = createMemoryHistory();
 		const router = createRouter({ history });
-
 		const dispatch = sinon.stub(router, 'dispatch');
 
 		router.listen();
