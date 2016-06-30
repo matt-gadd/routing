@@ -1,6 +1,7 @@
 import Promise from 'dojo-core/Promise';
 import { suite, test } from 'intern!tdd';
 import * as assert from 'intern/chai!assert';
+import * as sinon from 'sinon';
 
 import createRoute from '../../src/createRoute';
 import createRouter from '../../src/createRouter';
@@ -502,37 +503,29 @@ suite('createRouter', () => {
 		const router = createRouter({
 			history: createMemoryHistory({ path: '/foo' })
 		});
-		let executed = false;
-		router.append(createRoute({
-			path: '/foo',
-			exec () {
-				executed = true;
-			}
-		}));
-		return router.start({}).then((dispatched) => {
-			assert.isTrue(executed);
-			assert.isTrue(dispatched);
-		});
+		const context = { 'foo': 'bar' };
+		const dispatch = sinon.stub(router, 'dispatch');
+		router.start(context);
+
+		assert.isTrue(dispatch.calledWith(context, '/foo'));
 	});
 
 	test('dispatches on history change', () => {
 		const history = createMemoryHistory();
 		const router = createRouter({ history });
-		let executed = false;
-		router.append(createRoute({
-			path: '/foo',
-			exec () {
-				executed = true;
-			}
-		}));
-		router.start({});
-		assert.isTrue(false); // fix up!
+		const context = { 'foo': 'bar' };
+		router.start(context);
+
+		const dispatch = sinon.stub(router, 'dispatch');
+		history.set('/foo');
+		assert.isTrue(dispatch.calledWith(context, '/foo'));
 	});
 
 	test('throws if dispatch called before start', () => {
 		const router = createRouter({
 			history: createMemoryHistory()
 		});
+
 		assert.throws(() => router.dispatch({}, '/foo'));
 	});
 
