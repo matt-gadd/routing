@@ -39,7 +39,7 @@ export interface HashHistoryFactory extends ComposeFactory<HashHistory, HashHist
 
 const createHashHistory: HashHistoryFactory = compose({
 
-	start() {
+	listen() {
 		const { location, window } = global;
 		this._current = location.hash.slice(1);
 		this._location = location;
@@ -53,6 +53,8 @@ const createHashHistory: HashHistoryFactory = compose({
 			value: this._current
 		});
 	},
+
+	unlisten() {},
 
 	get current () {
 		return this._current;
