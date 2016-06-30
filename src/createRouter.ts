@@ -242,6 +242,7 @@ const createRouter: RouterFactory = compose<RouterMixin, RouterOptions>({
 		const listener = pausable(history, 'change', (event: HistoryChangeEvent) => {
 			instance.dispatch({}, event.value);
 		});
+		listener.pause();
 
 		historyMap.set(instance, { history, listener });
 		instance.own(history);
